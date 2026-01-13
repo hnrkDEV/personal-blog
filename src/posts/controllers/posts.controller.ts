@@ -1,4 +1,15 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { Posts } from '../entities/posts.entity';
 import { PostsService } from '../services/posts.service';
 
@@ -10,5 +21,35 @@ export class PostsController {
   @HttpCode(HttpStatus.OK)
   findAll(): Promise<Posts[]> {
     return this.postsService.findAll();
+  }
+
+  @Get('/:id')
+  @HttpCode(HttpStatus.OK)
+  findById(@Param('id', ParseIntPipe) id: number): Promise<Posts> {
+    return this.postsService.findById(id);
+  }
+
+  @Get('/titulo/:title')
+  @HttpCode(HttpStatus.OK)
+  searchForTitle(@Param('title') title: string): Promise<Posts[]> {
+    return this.postsService.searchForTitle(title);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() post: Posts): Promise<Posts> {
+    return this.postsService.create(post);
+  }
+
+  @Put()
+  @HttpCode(HttpStatus.OK)
+  update(@Body() post: Posts): Promise<Posts> {
+    return this.postsService.update(post);
+  }
+
+  @Delete('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.postsService.delete(id);
   }
 }
