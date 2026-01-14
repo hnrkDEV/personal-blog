@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
+import { ThemeService } from '../../theme/services/theme.service';
 import { Posts } from '../entities/posts.entity';
 
 @Injectable()
@@ -8,14 +9,18 @@ export class PostsService {
   constructor(
     @InjectRepository(Posts)
     private postsRepository: Repository<Posts>,
+    private themeService: ThemeService,
   ) {}
 
   async findAll(): Promise<Posts[]> {
-    return await this.postsRepository.find();
+    return await this.postsRepository.find({ relations: { theme: true } });
   }
 
   async findById(id: number): Promise<Posts> {
-    const posts = await this.postsRepository.findOneBy({ id });
+    const posts = await this.postsRepository.findOne({
+      where: { id },
+      relations: { theme: true },
+    });
     if (!posts) {
       throw new HttpException('Post Not Found!', 404);
     }
@@ -25,6 +30,7 @@ export class PostsService {
   async searchForTitle(title: string): Promise<Posts[]> {
     const posts = await this.postsRepository.find({
       where: { title: ILike(`%${title}%`) },
+      relations: { theme: true },
     });
     if (posts.length === 0) {
       throw new HttpException('No Posts Found with this Title!', 404);
@@ -33,6 +39,13 @@ export class PostsService {
   }
 
   async create(post: Posts): Promise<Posts> {
+    const theme = await this.themeService.findById(post.theme.id);
+
+    if (!theme) {
+      throw new HttpException('Theme Not Found!', 404);
+    }
+    post.theme = theme;
+
     return await this.postsRepository.save(post);
   }
 
@@ -41,6 +54,13 @@ export class PostsService {
     if (!existsPost) {
       throw new HttpException('Post Not Found!', 404);
     }
+
+    const theme = await this.themeService.findById(post.theme.id);
+    if (!theme) {
+      throw new HttpException('Theme Not Found!', 404);
+    }
+    post.theme = theme;
+
     return await this.postsRepository.save(post);
   }
 
