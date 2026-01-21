@@ -13,13 +13,15 @@ export class PostsService {
   ) {}
 
   async findAll(): Promise<Posts[]> {
-    return await this.postsRepository.find({ relations: { theme: true } });
+    return await this.postsRepository.find({
+      relations: { theme: true, user: true },
+    });
   }
 
   async findById(id: number): Promise<Posts> {
     const posts = await this.postsRepository.findOne({
       where: { id },
-      relations: { theme: true },
+      relations: { theme: true, user: true },
     });
     if (!posts) {
       throw new HttpException('Post Not Found!', 404);
@@ -30,7 +32,7 @@ export class PostsService {
   async searchForTitle(title: string): Promise<Posts[]> {
     const posts = await this.postsRepository.find({
       where: { title: ILike(`%${title}%`) },
-      relations: { theme: true },
+      relations: { theme: true, user: true },
     });
     if (posts.length === 0) {
       throw new HttpException('No Posts Found with this Title!', 404);
