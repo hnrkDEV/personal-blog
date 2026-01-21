@@ -9,10 +9,13 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../auth/guard/jwt-auth.guard';
 import { Posts } from '../entities/posts.entity';
 import { PostsService } from '../services/posts.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('/postagens')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
