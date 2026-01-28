@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Personal Blog')
+    .setTitle('Personal Blog - João Henrique')
     .setDescription(
       `
 API desenvolvida como projeto educacional e de portfólio, com o objetivo de aplicar na prática conceitos de desenvolvimento back-end utilizando NestJS.
